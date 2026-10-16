@@ -127,10 +127,12 @@ function labelNode(
   y: number,
   size: number,
   color: string,
+  role?: 'label',
 ): SvgNode {
   return el(
     'text',
     [
+      ...(role ? ([['data-role', role]] as [string, string][]) : []),
       ['x', x],
       ['y', y],
       ['font-size', size],
@@ -214,7 +216,7 @@ function drawObject(scene: Scene, o: SceneObject, t: number, animated: boolean):
   if (o.label !== null) {
     const L = o.label;
     const [lx, ly] = o.kind === 'arrow' || o.kind === 'region' ? anchor(o) : [ax, ay];
-    nodes.push(labelNode(scene, L.text, lx + L.dx, ly + L.dy, L.size, color));
+    nodes.push(labelNode(scene, L.text, lx + L.dx, ly + L.dy, L.size, color, 'label'));
   }
   return nodes;
 }

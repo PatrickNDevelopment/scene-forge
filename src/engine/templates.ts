@@ -191,7 +191,7 @@ type Builder = (ctx: Ctx) => SceneObject[];
 const BUILDERS: Record<TemplateId, Builder> = {
   encirclement: (ctx) => {
     const cx = 640;
-    const cy = 400;
+    const cy = 390;
     const out: SceneObject[] = [
       region(ctx, 'held-ground', octagon(cx, cy, 130, 95), ctx.b, [0, 0.3]),
     ];
@@ -205,10 +205,10 @@ const BUILDERS: Record<TemplateId, Builder> = {
     );
     D8.forEach(([dx, dy], i) => {
       const x = cx + dx * 420;
-      const y = cy + dy * 250 + 50;
+      const y = cy + dy * 215 + 40;
       out.push(
         fig(ctx, `attacker-${i + 1}`, x, y, ctx.a, 'walk', dx < 0 ? 1 : -1, {
-          anim: move(cx + dx * 560, cy + dy * 330 + 50, 0, 0.55),
+          anim: move(cx + dx * 560, cy + dy * 300 + 40, 0, 0.55),
           ...(i === 0 ? { label: lbl(ctx.names[ctx.a] ?? '', 0, -120) } : {}),
         }),
       );
@@ -228,7 +228,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         ),
       );
     });
-    out.push(text('title', cx, 64, 'Encirclement'));
+    out.push(text('title', cx, 92, 'Encirclement'));
     return out;
   },
 
@@ -274,7 +274,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         ctx.a,
         { draw: [0.3, 0.9] },
       ),
-      text('title', 640, 64, 'Retreat'),
+      text('title', 640, 92, 'Retreat'),
     );
     return out;
   },
@@ -335,7 +335,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         ctx.a,
         { draw: [0.45, 0.85] },
       ),
-      text('title', 640, 64, 'Siege'),
+      text('title', 640, 92, 'Siege'),
     );
     return out;
   },
@@ -365,7 +365,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
     prop(ctx, 'goods-east', 990, 470, 'crate', ctx.b),
     fig(ctx, 'trader-1', 330, 470, ctx.a, 'point', 1),
     fig(ctx, 'trader-2', 950, 470, ctx.b, 'cheer', -1),
-    text('title', 640, 64, 'Trade route'),
+    text('title', 640, 92, 'Trade route'),
   ],
 
   'supply-line': (ctx) => {
@@ -399,7 +399,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         }),
       );
     });
-    out.push(text('title', 640, 64, 'Supply line'));
+    out.push(text('title', 640, 92, 'Supply line'));
     return out;
   },
 
@@ -446,7 +446,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         { draw: [0.2, 0.7] },
       ),
       region(ctx, 'common-ground', octagon(640, 470, 230, 110), ctx.c, [0.7, 1]),
-      text('title', 640, 64, 'Alliance formation'),
+      text('title', 640, 92, 'Alliance formation'),
     );
     return out;
   },
@@ -454,7 +454,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
   'alliance-collapse': (ctx) => {
     const out: SceneObject[] = [
       prop(ctx, 'broken-flag', 640, 540, 'flag', ctx.c),
-      fig(ctx, 'fallen', 640, 600, null, 'fallen', 1, { label: lbl('Alliance collapses', 0, 50) }),
+      fig(ctx, 'fallen', 640, 580, null, 'fallen', 1, { label: lbl('Alliance collapses', 0, 50) }),
     ];
     [0, 1, 2].forEach((i) => {
       out.push(
@@ -491,7 +491,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
         ctx.b,
         { draw: [0.3, 0.8] },
       ),
-      text('title', 640, 64, 'Alliance collapse'),
+      text('title', 640, 92, 'Alliance collapse'),
     );
     return out;
   },
@@ -526,7 +526,7 @@ const BUILDERS: Record<TemplateId, Builder> = {
       fig(ctx, 'witness-2', 960, 650, ctx.b, 'cheer', -1, {
         label: lbl(ctx.names[ctx.b] ?? '', 0, -118),
       }),
-      text('title', 640, 64, 'Timeline'),
+      text('title', 640, 92, 'Timeline'),
     );
     return out;
   },
