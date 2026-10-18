@@ -147,7 +147,7 @@ describe('animation', () => {
     const out = svg(buildTemplate('retreat', { seed: 2 }), undefined, true);
     expect(out).toMatch(/<style>@media \(prefers-reduced-motion: no-preference\)\{@keyframes/);
     expect(out).toContain('class="sf-m-retreating-1"');
-    expect(out).toContain('class="sf-d-withdrawal"');
+    expect(out).toContain('class="sf-f-withdrawal"');
     expect(xmlProblem(out)).toBeNull();
   });
 });

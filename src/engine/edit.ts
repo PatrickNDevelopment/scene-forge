@@ -162,7 +162,10 @@ export function setAnimTiming(scene: Scene, id: string, start: number, end: numb
 export function freshId(scene: Scene, prefix: string): string {
   const taken = new Set(scene.objects.map((o) => o.id));
   for (let n = 1; ; n += 1) {
-    const candidate = `${prefix}-${n}`.slice(0, 32);
+    // Shorten the prefix, never the number: truncating the whole candidate made it repeat
+    // forever for long ids (duplicating a 32-character id hung the page).
+    const suffix = `-${n}`;
+    const candidate = `${prefix.slice(0, 32 - suffix.length)}${suffix}`;
     if (!taken.has(candidate)) return candidate;
   }
 }
@@ -230,21 +233,46 @@ export function reorder(scene: Scene, id: string, dir: 1 | -1): Scene {
   return { ...scene, objects };
 }
 
-/** Renames a faction and updates every label or text that contained the old name. */
-export function renameFaction(scene: Scene, factionId: string, rawName: string): Scene {
-  const f = scene.factions.find((x) => x.id === factionId);
+/**
+ * Renames a faction and updates every label or text that contained the old name.
+ *
+ * `base` is the scene as it was when the user started typing the name (defaults to `scene`). Label
+ * and text replacements are computed from `base`, never from the intermediate names typed so far:
+ * replacing per keystroke would otherwise replace every later occurrence of a short intermediate
+ * name (typing "red" turned "trade route" into "tredade redoute").
+ */
+export function renameFaction(
+  scene: Scene,
+  factionId: string,
+  rawName: string,
+  base: Scene = scene,
+): Scene {
+  const cur = scene.factions.find((x) => x.id === factionId);
+  const orig = base.factions.find((x) => x.id === factionId) ?? cur;
   const name = Array.from(cleanText(rawName)).slice(0, LIMITS.factionNameMax).join('');
-  if (!f || name.trim() === '' || name === f.name) return scene;
+  if (!cur || !orig || name.trim() === '' || name === cur.name) return scene;
+  const old = orig.name;
   const swap = (t: string): string =>
-    f.name !== '' && t.includes(f.name)
-      ? Array.from(t.split(f.name).join(name)).slice(0, LIMITS.textMax).join('')
+    old !== '' && t.includes(old)
+      ? Array.from(t.split(old).join(name)).slice(0, LIMITS.textMax).join('')
       : t;
+  const from = new Map(base.objects.map((o) => [o.id, o]));
   return {
     ...scene,
     factions: scene.factions.map((x) => (x.id === factionId ? { ...x, name } : x)),
     objects: scene.objects.map((o) => {
-      const label = o.label === null ? null : { ...o.label, text: swap(o.label.text) };
-      return o.kind === 'text' ? { ...o, label, text: swap(o.text) } : { ...o, label };
+      const b = from.get(o.id);
+      if (b === undefined) return o;
+      const label =
+        o.label === null
+          ? null
+          : b.label !== null && b.label.text.includes(old)
+            ? { ...o.label, text: swap(b.label.text) }
+            : o.label;
+      if (o.kind === 'text' && b.kind === 'text' && b.text.includes(old)) {
+        return { ...o, label, text: swap(b.text) };
+      }
+      return { ...o, label };
     }),
   };
 }

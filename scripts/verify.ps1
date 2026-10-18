@@ -1,5 +1,7 @@
 # Runs every verification step; stops at the first failure with a nonzero exit code.
 $ErrorActionPreference = 'Stop'
+# npm writes warnings to stderr; with 'Stop' PowerShell 5.1 turns redirected stderr into a terminating
+# error. Each step is judged by its exit code instead.
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
 $steps = @(
@@ -12,6 +14,7 @@ $steps = @(
   @{ Name = 'secret scan'; Args = @('run', 'secrets') },
   @{ Name = 'browser e2e'; Args = @('run', 'e2e') }
 )
+$ErrorActionPreference = 'Continue'
 foreach ($s in $steps) {
   Write-Host "==> $($s.Name)" -ForegroundColor Cyan
   & npm @($s.Args)

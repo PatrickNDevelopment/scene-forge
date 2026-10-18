@@ -9,7 +9,11 @@
   labels differ between machines. Visual QA estimates label boxes (characters x size x 0.56).
 - **No arbitrary point editing** for arrows and regions in v0.1: they move as a whole. New arrows and
   regions start from a default shape.
-- **Animations** are limited to movement and draw-on with an ease-in-out curve. The animated export
+- **Renaming a faction** replaces its old name wherever it appears in label and text objects, also
+  inside longer words (renaming "A" would touch "Alliance"). Undo restores the previous text.
+- **Animations** are limited to movement and draw-on with an ease-in-out curve; a dashed arrow
+  with a draw animation fades in instead of drawing on (a dash pattern and a draw-on offset cannot
+  share one dash array). The animated export
   uses CSS keyframes; some SVG editors ignore CSS animation and show the final frame.
 - **Storage**: the current scene and up to 20 presets live in this browser's `localStorage` (about
   5 MB). A full store shows a banner; save the scene as JSON.

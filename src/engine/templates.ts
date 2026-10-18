@@ -579,6 +579,7 @@ export function regenerate(scene: Scene, seed: number): Scene | null {
     title: scene.title,
   });
   const labels = new Map(scene.objects.map((o) => [o.id, o.label]));
+  const factionIds = new Set(scene.factions.map((f) => f.id));
   return {
     ...fresh,
     canvas: scene.canvas,
@@ -587,7 +588,10 @@ export function regenerate(scene: Scene, seed: number): Scene | null {
     factions: scene.factions,
     objects: fresh.objects.map((o) => {
       const kept = labels.get(o.id);
-      return kept === undefined ? o : { ...o, label: kept };
+      // With every faction removed the template falls back to the default faction ids, which
+      // this scene no longer has: such objects use the ink colour instead of an invalid reference.
+      const factionId = o.factionId !== null && factionIds.has(o.factionId) ? o.factionId : null;
+      return { ...o, factionId, label: kept === undefined ? o.label : kept };
     }),
   };
 }

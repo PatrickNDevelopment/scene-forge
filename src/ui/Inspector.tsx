@@ -91,6 +91,47 @@ function TextField({
   );
 }
 
+/**
+ * A faction name field. Labels follow the name as you type; the replacement is computed from the
+ * scene as it was when the field got focus, so intermediate names never leak into labels.
+ */
+function FactionNameField({
+  scene,
+  factionId,
+  name,
+  apply,
+}: {
+  scene: Scene;
+  factionId: string;
+  name: string;
+  apply: Props['apply'];
+}): ReactNode {
+  const [draft, setDraft] = useState<string | null>(null);
+  const [base, setBase] = useState<Scene | null>(null);
+  return (
+    <label className="field">
+      {`Name of ${factionId}`}
+      <input
+        value={draft ?? name}
+        maxLength={40}
+        data-testid={`faction-name-${factionId}`}
+        onFocus={() => setBase(scene)}
+        onChange={(e) => {
+          const v = e.target.value;
+          setDraft(v);
+          const from = base ?? scene;
+          if (v.trim() !== '')
+            apply((s) => E.renameFaction(s, factionId, v, from), `faction-name:${factionId}`);
+        }}
+        onBlur={() => {
+          setDraft(null);
+          setBase(null);
+        }}
+      />
+    </label>
+  );
+}
+
 export function Inspector({ scene, selected, apply, onSelect, onRegenerate }: Props): ReactNode {
   const [regenSeed, setRegenSeed] = useState(String((scene.seed + 1) % 4294967296));
 
@@ -160,15 +201,7 @@ export function Inspector({ scene, selected, apply, onSelect, onRegenerate }: Pr
           <ul className="plain">
             {scene.factions.map((f) => (
               <li key={f.id} className="faction-row">
-                <TextField
-                  label={`Name of ${f.id}`}
-                  value={f.name}
-                  maxLength={40}
-                  testId={`faction-name-${f.id}`}
-                  onCommit={(v) =>
-                    apply((s) => E.renameFaction(s, f.id, v), `faction-name:${f.id}`)
-                  }
-                />
+                <FactionNameField scene={scene} factionId={f.id} name={f.name} apply={apply} />
                 <label className="field inline">
                   Colour
                   <input

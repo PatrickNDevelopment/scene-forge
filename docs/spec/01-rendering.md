@@ -48,12 +48,17 @@ on strokes.
 At time `t` (0 to 1): for `move`, progress `p = clamp((t - start) / (end - start))`, eased with
 `p * p * (3 - 2 * p)`, and the object is drawn at `from + (to - from) * eased`. For `draw`, the path
 carries `pathLength="100"`, `stroke-dasharray="100"` and `stroke-dashoffset = 100 * (1 - eased)`, so no
-path length has to be measured (the arrow head appears when the shaft is complete). Before its start an animated object is drawn at its starting state. `t = 1` is the
-final scene, which is also the static export.
+path length has to be measured (the arrow head appears when the shaft is complete). A **dashed**
+arrow cannot also use the dash array for drawing on, so a dashed arrow with a `draw` animation fades
+in instead: its strokes (shaft and head) carry `stroke-opacity = eased` (the second pass
+`0.55 * eased`) and keep their dash pattern; when complete the attribute is omitted. Before its
+start an animated object is drawn at its starting state. `t = 1` is the final scene, which is also
+the static export.
 
 **Animated export** (optional) writes CSS `@keyframes` inside the SVG `<style>` and wraps them in
 `@media (prefers-reduced-motion: no-preference)`, so a viewer that asks for reduced motion sees the
-final state.
+final state. Draw-on uses `sf-d-<id>` (dash offset), dashed arrows `sf-f-<id>` (opacity) and moves
+`sf-m-<id>` (transform).
 
 ## Export
 

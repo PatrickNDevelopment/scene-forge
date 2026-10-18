@@ -35,6 +35,23 @@ function viewFromHash(): View {
   return VIEWS.find((v) => v.id === h)?.id ?? 'editor';
 }
 
+/** Inputs whose own Ctrl+Z edits text; checkboxes, sliders, colour pickers and buttons do not. */
+const NON_TEXT_INPUTS = new Set([
+  'checkbox',
+  'radio',
+  'range',
+  'color',
+  'button',
+  'submit',
+  'file',
+]);
+function isTextEntry(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.tagName === 'TEXTAREA' || target.isContentEditable) return true;
+  if (target.tagName !== 'INPUT') return false;
+  return !NON_TEXT_INPUTS.has((target as HTMLInputElement).type);
+}
+
 function initialScene(load: LoadResult): E.Scene {
   return load.kind === 'ok' ? load.scene : E.buildTemplate('encirclement', { seed: 1 });
 }
@@ -154,9 +171,7 @@ export function App(): ReactNode {
   // global undo/redo shortcuts (not while typing in a field)
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent): void => {
-      const el = e.target as HTMLElement | null;
-      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'))
-        return;
+      if (isTextEntry(e.target)) return; // the field's own undo applies while typing
       if (!(e.ctrlKey || e.metaKey)) return;
       const k = e.key.toLowerCase();
       if (k === 'z' && !e.shiftKey) {

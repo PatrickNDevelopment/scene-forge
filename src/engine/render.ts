@@ -79,7 +79,9 @@ interface StrokeStyle {
   width: number;
   dashed?: boolean;
   draw?: number; // 0..1 draw-on progress; undefined = fully drawn, no dash attributes
-  cls?: string;
+  drawCls?: string; // animated export: CSS class animating the draw-on
+  fade?: number; // 0..1 opacity while a dashed arrow fades in; undefined = fully visible
+  fadeCls?: string; // animated export: CSS class animating the fade-in
 }
 
 function sketch(
@@ -101,15 +103,17 @@ function sketch(
       ['stroke-linecap', 'round'],
       ['stroke-linejoin', 'round'],
     ];
-    if (pass === 1) attrs.push(['stroke-opacity', '0.55']);
-    if (style.draw !== undefined || style.cls !== undefined) {
+    if (pass === 0 && style.fade !== undefined) attrs.push(['stroke-opacity', style.fade]);
+    if (pass === 1) attrs.push(['stroke-opacity', 0.55 * (style.fade ?? 1)]);
+    if (style.draw !== undefined || style.drawCls !== undefined) {
       attrs.push(['pathLength', '100']);
       attrs.push(['stroke-dasharray', '100']);
       attrs.push(['stroke-dashoffset', 100 * (1 - (style.draw ?? 1))]);
     } else if (style.dashed) {
       attrs.push(['stroke-dasharray', `${style.width * 4} ${style.width * 3}`]);
     }
-    if (style.cls) attrs.push(['class', style.cls]);
+    if (style.drawCls) attrs.push(['class', style.drawCls]);
+    else if (style.fadeCls) attrs.push(['class', style.fadeCls]);
     out.push(el('path', attrs));
   }
   return out;
@@ -185,17 +189,23 @@ function drawObject(scene: Scene, o: SceneObject, t: number, animated: boolean):
       el('g', [['transform', `translate(${fmtPair(ax, ay)}) scale(${fmtPair(s, s)})`]], inner),
     );
   } else if (o.kind === 'arrow') {
+    // A dash pattern and a draw-on dash offset cannot share one stroke-dasharray, so a dashed
+    // arrow with a draw animation fades in instead and keeps its dashes (docs/spec/01-rendering.md).
+    const fades = o.dashed && o.anim.kind === 'draw';
     const style: StrokeStyle = { color, width: o.width, dashed: o.dashed };
-    if (drawP !== undefined) style.draw = drawP;
-    if (drawCls !== undefined) style.cls = drawCls;
+    const headStyle: StrokeStyle = { color, width: o.width };
+    if (fades) {
+      if (drawP !== undefined && drawP < 1) style.fade = headStyle.fade = drawP;
+      if (animated) style.fadeCls = headStyle.fadeCls = `sf-f-${o.id}`;
+    } else {
+      if (drawP !== undefined) style.draw = drawP;
+      if (drawCls !== undefined) style.drawCls = drawCls;
+      if (drawP !== undefined) headStyle.draw = drawP < 1 ? 0 : 1;
+      if (drawCls !== undefined) headStyle.drawCls = drawCls;
+    }
     nodes.push(...sketch(scene, o.id, 0, o.points, style));
     const head = arrowHead(o.points, o.width);
-    if (head !== null) {
-      const headStyle: StrokeStyle = { color, width: o.width };
-      if (drawP !== undefined) headStyle.draw = drawP < 1 ? 0 : 1;
-      if (drawCls !== undefined) headStyle.cls = drawCls;
-      nodes.push(...sketch(scene, o.id, 1, head, headStyle));
-    }
+    if (head !== null) nodes.push(...sketch(scene, o.id, 1, head, headStyle));
   } else if (o.kind === 'region') {
     const closedPts: Point[] = [...o.points, o.points[0] as Point];
     const fillAttrs: [string, string | number][] = [
@@ -207,7 +217,7 @@ function drawObject(scene: Scene, o: SceneObject, t: number, animated: boolean):
     nodes.push(el('path', fillAttrs));
     const style: StrokeStyle = { color, width: 2.5 };
     if (drawP !== undefined) style.draw = drawP;
-    if (drawCls !== undefined) style.cls = drawCls;
+    if (drawCls !== undefined) style.drawCls = drawCls;
     nodes.push(...sketch(scene, o.id, 0, closedPts, style, true));
   } else {
     nodes.push(labelNode(scene, o.text, ax, ay, o.size, color));
@@ -255,6 +265,11 @@ function keyframes(scene: Scene): string {
       rules.push(
         `@keyframes sf-m-${o.id}{from{transform:translate(${pathData([o.anim.fromX - x])}px,${pathData([o.anim.fromY - y])}px)}to{transform:translate(0px,0px)}}`,
         `.sf-m-${o.id}{animation:sf-m-${o.id} ${dur}ms ease-in-out ${delay}ms both}`,
+      );
+    } else if (o.kind === 'arrow' && o.dashed) {
+      rules.push(
+        `@keyframes sf-f-${o.id}{from{opacity:0}to{opacity:1}}`,
+        `.sf-f-${o.id}{animation:sf-f-${o.id} ${dur}ms ease-in-out ${delay}ms both}`,
       );
     } else {
       rules.push(

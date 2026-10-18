@@ -110,6 +110,40 @@ test('undo and redo, by buttons and by keyboard', async ({ page }) => {
   await expect(page.getByTestId('pick-witness-1')).toHaveCount(1);
 });
 
+test('acceptance regressions: typing a faction name, dashed toggle, Ctrl+Z on a checkbox, regenerate without factions', async ({
+  page,
+}) => {
+  // typing a new faction name key by key keeps labels clean (was "tredade redoute")
+  await useTemplate(page, 'trade-route');
+  const name = page.getByTestId('faction-name-faction-a');
+  await name.click();
+  await name.press('Control+a');
+  await page.keyboard.type('red');
+  const labels = page.getByTestId('scene-svg').locator('text[data-role="label"]');
+  await expect(labels).toHaveText(['red market', 'Faction B port', 'trade route']);
+
+  // the Dashed checkbox changes a draw-animated arrow (it was inert), and Ctrl+Z undoes it
+  // while the checkbox still has focus
+  await useTemplate(page, 'retreat');
+  await page.getByTestId('pick-withdrawal').click();
+  const path = page.getByTestId('scene-svg').locator('[data-id="withdrawal"] path').first();
+  await expect(path).toHaveAttribute('stroke-dasharray', '16 12');
+  const dashed = page.getByRole('checkbox', { name: 'Dashed' });
+  await dashed.click();
+  await expect(path).not.toHaveAttribute('stroke-dasharray', '16 12');
+  await page.keyboard.press('Control+z');
+  await expect(dashed).toBeChecked();
+  await expect(path).toHaveAttribute('stroke-dasharray', '16 12');
+
+  // regenerate after removing every faction stays valid and saved
+  await useTemplate(page, 'encirclement');
+  for (const f of ['Faction A', 'Faction B', 'Faction C'])
+    await page.getByRole('button', { name: `Remove ${f}` }).click();
+  await page.getByRole('button', { name: 'Regenerate' }).click();
+  await expect(page.getByTestId('notice')).toContainText('Regenerated');
+  await expect(page.getByTestId('save-failed')).toHaveCount(0);
+});
+
 test('dragging an object with the mouse moves it', async ({ page }) => {
   await useTemplate(page, 'retreat');
   const fig = page.getByTestId('scene-svg').locator('[data-id="pursuer-2"] path').first();
@@ -150,7 +184,7 @@ test('animation: scrubbing changes the frame; reduced motion disables playback',
   page,
 }) => {
   await useTemplate(page, 'retreat');
-  const path = page.getByTestId('scene-svg').locator('[data-id="withdrawal"] path').first();
+  const path = page.getByTestId('scene-svg').locator('[data-id="pursuit"] path').first();
   await expect(path).toHaveAttribute('stroke-dashoffset', '0');
   await page.getByTestId('scrub').fill('0');
   await expect(path).toHaveAttribute('stroke-dashoffset', '100');

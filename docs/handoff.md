@@ -1,7 +1,10 @@
 # Handoff
 
 **State:** v0.1 built locally on branch `phase/04a-build`. Not pushed, not deployed, no remote.
-Registry status `in_progress` until an independent acceptance review passes.
+An independent acceptance review (docs/test-report.md, Part 1) fixed four defects with regression
+tests (dashed arrows drawn solid, faction-name typing corrupting labels, regenerate after removing
+every faction, duplicate of a 32-character id looping forever) plus keyboard undo on checkboxes.
+Its evidence supports `ready_for_publication_review`; the lead engineer updates the registry.
 
 ## Run
 
@@ -32,7 +35,7 @@ npm run golden:update   # only after an intended rendering change; review tests/
 
 ## Release blockers before publication
 
-1. Independent acceptance review.
+1. Independent acceptance review: done (docs/test-report.md, Part 1).
 2. Owner review and explicit approval to publish.
 3. First CI run on Linux (golden SVGs must match there).
 
