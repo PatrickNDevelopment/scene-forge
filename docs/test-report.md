@@ -107,7 +107,7 @@ diff only replaces the draw attributes of the two dashed arrows with `stroke-das
 
 ### Final full gate
 
-`scriptserify.ps1` on commit `3d2e2d8` (fixes plus this report), exit 0: `npm ci` (0
+`scripts/verify.ps1` on commit `3d2e2d8` (fixes plus this report), exit 0: `npm ci` (0
 vulnerabilities), format, lint, types, 4 files / 40 unit tests, build, secret scan (no findings),
 15 Playwright tests, `ALL CHECKS PASSED`. The next commit only adds this paragraph (format check and
 secret scan rerun on it). Screenshots were restored with `git checkout docs/screenshots` (UI
