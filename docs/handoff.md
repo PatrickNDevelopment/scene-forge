@@ -1,6 +1,6 @@
 # Handoff
 
-**State:** v0.1 built locally on branch `phase/04a-build`. Not pushed, not deployed, no remote.
+**State:** v0.1 built locally on branch `phase/04a-build`. Published 2026-10-19: https://github.com/PatrickNDevelopment/scene-forge (branch `main`), demo https://patrickndevelopment.github.io/scene-forge/; CI and Pages green on the first run.
 An independent acceptance review (docs/test-report.md, Part 1) fixed four defects with regression
 tests (dashed arrows drawn solid, faction-name typing corrupting labels, regenerate after removing
 every faction, duplicate of a 32-character id looping forever) plus keyboard undo on checkboxes.
@@ -30,14 +30,15 @@ npm run golden:update   # only after an intended rendering change; review tests/
 
 ## What is absent
 
-- No hosted demo; CI and Pages workflows have never run (no remote).
+- Hosted demo: https://patrickndevelopment.github.io/scene-forge/ (static build). CI and Pages ran green on the first push (2026-10-19).
 - Point-level editing of arrows and regions (see docs/backlog.md).
 
-## Release blockers before publication
+## Publication
 
-1. Independent acceptance review: done (docs/test-report.md, Part 1).
-2. Owner review and explicit approval to publish.
-3. First CI run on Linux (golden SVGs must match there).
+Published 2026-10-19 with the owner's approval (portfolio decision D-007): public repository
+https://github.com/PatrickNDevelopment/scene-forge (MIT, branch `main`), GitHub Pages at https://patrickndevelopment.github.io/scene-forge/. The
+first CI run (Linux, Chromium) and Pages deployment were green; a live check loaded the demo,
+refreshed it and found no console errors and no requests to localhost.
 
 ## Gotchas
 

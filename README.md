@@ -6,8 +6,7 @@ same scene file, style version and seed always produce **exactly the same SVG**.
 
 ![SceneForge editor on desktop](docs/screenshots/desktop-editor.png)
 
-> **Status:** v0.1, built and tested locally. It is **not published or deployed**: there is no hosted
-> demo yet, so run it locally (below). Scenes are illustrations; they are not maps and are not
+> **Status:** v0.1, published. **[Try the demo](https://patrickndevelopment.github.io/scene-forge/)** or run it locally (below). Scenes are illustrations; they are not maps and are not
 > geographically accurate.
 
 ## What it does

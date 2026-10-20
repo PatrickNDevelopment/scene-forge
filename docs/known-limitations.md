@@ -1,7 +1,6 @@
 # Known limitations
 
-- **Not deployed and not published.** There is no hosted demo. A Pages workflow exists but has not
-  run on a remote.
+- **Published 2026-10-19.** CI (Linux, Chromium) and the Pages deploy were green on the first run.
 - **Illustrations, not maps.** Templates and scenes are diagrams with invented names. Nothing is
   geographically accurate, and SceneForge never claims otherwise.
 - **Fonts vary.** Text uses the viewer's hand-writing font (Segoe Print, Comic Sans MS, Comic Neue,
