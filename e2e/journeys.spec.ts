@@ -170,8 +170,11 @@ test('dragging a label moves only the label', async ({ page }) => {
   const label = page
     .getByTestId('scene-svg')
     .locator('[data-id="defender-2"] text[data-role="label"]');
-  const box = await label.boundingBox();
-  if (!box) throw new Error('no label box');
+  // Read the position in the page: Playwright's boundingBox() misplaces SVG text in WebKit.
+  const box = await label.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  });
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2, { steps: 6 });
@@ -401,7 +404,8 @@ test('accessible names everywhere and no horizontal overflow at 320 px', async (
   }
 });
 
-test('screenshots: desktop, mobile, dark', async ({ page }) => {
+test('screenshots: desktop, mobile, dark', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'documentation screenshots come from Chromium');
   await page.setViewportSize({ width: 1440, height: 1000 });
   await useTemplate(page, 'encirclement');
   await page.getByTestId('pick-defender-2').click();

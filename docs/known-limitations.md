@@ -20,8 +20,13 @@
   320 px layout are tested. There has been no screen-reader session and no 200% zoom audit. The
   canvas drawing itself is an image with a text alternative (the scene title); the object list is the
   accessible way to reach objects.
-- **Browsers**: tested in Microsoft Edge (Chromium) locally and Chromium in CI. Firefox and Safari are
-  untested.
-- **Platforms**: developed and verified on Windows 10 with Node 24. CI targets Linux (not run on a
-  remote yet); the golden SVGs are expected to match there because the engine uses no
-  platform-dependent maths.
+- **Browsers:** the end-to-end suite runs in Chromium, Firefox and WebKit (Safari's engine) in CI
+  and was run in all three locally on 2026-10-20 (Edge for Chromium). WebKit is not Safari itself, and
+  there has been no screen-reader session. In WebKit, as in Safari by default, Tab skips links.
+- **Platforms**: developed and verified on Windows 10 with Node 24. CI runs on Linux, where the
+  golden SVG tests have passed since publication (the engine uses no platform-dependent maths).
+- **Shared browser storage on the demo site.** All ten portfolio demos are served from
+  `patrickndevelopment.github.io`, so they share one browser storage quota (about 5 MB). Each app
+  uses its own `scene-forge.*` keys and only reacts to changes of its own keys, but a very large workspace
+  in one demo can make saving fail in another (the app then shows its save-failed notice). A local
+  run has its own origin and is not affected.
