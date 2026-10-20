@@ -1,10 +1,9 @@
 # Handoff
 
-**State:** v0.1 built locally on branch `phase/04a-build`. Published 2026-10-19: https://github.com/PatrickNDevelopment/scene-forge (branch `main`), demo https://patrickndevelopment.github.io/scene-forge/; CI and Pages green on the first run.
-An independent acceptance review (docs/test-report.md, Part 1) fixed four defects with regression
-tests (dashed arrows drawn solid, faction-name typing corrupting labels, regenerate after removing
-every faction, duplicate of a 32-character id looping forever) plus keyboard undo on checkboxes.
-Its evidence supports `ready_for_publication_review`; the lead engineer updates the registry.
+**State:** v0.1, accepted by an independent review (prompt 04B, 2026-10-18) that fixed six defects with regression tests (dashed arrows drawn solid, faction renames corrupting labels, regenerate after removing every faction, an endless loop duplicating long ids, keyboard undo with a checkbox or slider focused, and a `verify.ps1` abort under redirected output) (see Part 1 / "Independent acceptance" in
+[test-report.md](test-report.md)). Published 2026-10-19: https://github.com/PatrickNDevelopment/scene-forge, branch `main`; demo
+https://patrickndevelopment.github.io/scene-forge/. CI and Pages are green; the final cross-portfolio audit (2026-10-20) found no
+P0 or P1 issue. The reviews were separate Claude Code sessions, not human audits.
 
 ## Run
 
